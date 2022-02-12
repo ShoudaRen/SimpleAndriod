@@ -79,6 +79,16 @@
                android:layout_below="@+id/des"
                android:layout_alignParentEnd="true"
                android:src="@drawable/ic_up"></ImageView>
+           <TextView
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:text="Delete"
+               android:layout_below="@+id/des"
+               android:layout_toStartOf="@+id/btn_up_arro"
+               android:textColor="#F10606"
+               android:id="@+id/deletebtn"
+               android:layout_marginEnd="7dp"
+               ></TextView>
 
 
        </RelativeLayout>

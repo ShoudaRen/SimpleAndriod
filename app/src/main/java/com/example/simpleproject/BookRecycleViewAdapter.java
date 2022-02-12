@@ -1,6 +1,7 @@
 package com.example.simpleproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,9 +23,12 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
     private static final String TAG = "BookRecycleViewAdapter";
   private ArrayList<Book> books = new ArrayList<>();
   private Context myContext;
+  //判断是哪个activity
+  private String avtivity;
 
-    public BookRecycleViewAdapter(Context myContext) {
+    public BookRecycleViewAdapter(Context myContext, String avtivity) {
         this.myContext = myContext;
+        this.avtivity = avtivity;
     }
 
     public void setBooks(ArrayList<Book> books) {
@@ -49,7 +53,11 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(myContext, books.get(position).getName()+" clicked", Toast.LENGTH_SHORT).show();
+
+                // intent 同样可以传递数据
+                Intent intent = new Intent(myContext,BookActivity.class);
+                intent.putExtra("bookid",books.get(position).getId());
+                myContext.startActivity(intent);
             }
         });
 
@@ -63,6 +71,25 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
             TransitionManager.beginDelayedTransition(holder.cardView);
             holder.descrption.setVisibility(View.VISIBLE);
             holder.downArrow.setVisibility(View.GONE);
+
+            if (avtivity.equals("allBookActivity")){
+                //all book page 不显示
+                   holder.textDel.setVisibility(View.GONE);
+            }else if (avtivity.equals("myfavActivity")){
+                //删除
+                holder.textDel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (  utils.getInstance().delFavBook(books.get(position))){
+                            Toast.makeText(myContext, "delete success", Toast.LENGTH_SHORT).show();
+                            notifyDataSetChanged();
+                        }else {
+                            Toast.makeText(myContext, "System Wrong,pls try again later", Toast.LENGTH_SHORT).show();
+                        }
+                      
+                    }
+                });
+            }
         }else {
             TransitionManager.beginDelayedTransition(holder.cardView);
             holder.descrption.setVisibility(View.GONE);
@@ -73,18 +100,16 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
 
     @Override
     public int getItemCount() {
-        return 1;
+        return books.size();
     }
-
-
-
+    
     public class ViewHolder extends RecyclerView.ViewHolder{
         private CardView cardView;
         private ImageView imageView;
         private TextView textView;
         private ImageView downArrow, upArrow;
         private RelativeLayout descrption;
-        private TextView author,textAuthor,txtDes;
+        private TextView author,textAuthor,txtDes, textDel;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -98,6 +123,7 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
             author=itemView.findViewById(R.id.author);
             textAuthor=itemView.findViewById(R.id.txtAuthor);
             txtDes=itemView.findViewById(R.id.des);
+            textDel=itemView.findViewById(R.id.deletebtn);
 
             downArrow.setOnClickListener(new View.OnClickListener() {
                 @Override

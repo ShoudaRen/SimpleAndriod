@@ -10,7 +10,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
 
-    private Button seeAll,currentBook,already,wishlisht,about;
+    private Button seeAll,myFav,already,wishlisht,about;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +24,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        myFav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,MyFavActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void initialView() {
         seeAll = findViewById(R.id.seeAll);
-        currentBook = findViewById(R.id.currentBook);
+        myFav = findViewById(R.id.currentBook);
         already = findViewById(R.id. already);
         wishlisht = findViewById(R.id.wishlisht);
         about = findViewById(R.id.about);
