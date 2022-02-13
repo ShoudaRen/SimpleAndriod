@@ -1,6 +1,8 @@
 package com.example.simpleproject;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -80,12 +82,31 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
                 holder.textDel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if (  utils.getInstance().delFavBook(books.get(position))){
-                            Toast.makeText(myContext, "delete success", Toast.LENGTH_SHORT).show();
-                            notifyDataSetChanged();
-                        }else {
-                            Toast.makeText(myContext, "System Wrong,pls try again later", Toast.LENGTH_SHORT).show();
-                        }
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(myContext);
+                        builder.setMessage("are u sure you want to delete this book  "
+                                + books.get(position).getName()+ "  ?");
+                        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if (  utils.getInstance().delFavBook(books.get(position))){
+                                    Toast.makeText(myContext, "delete success", Toast.LENGTH_SHORT).show();
+                                    notifyDataSetChanged();
+                                }else {
+                                    Toast.makeText(myContext, "System Wrong,pls try again later", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // do nothing
+                            }
+                        });
+
+                        // 显示对话框
+                        builder.create().show();
                       
                     }
                 });
@@ -97,12 +118,11 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
         }
     }
 
-
     @Override
     public int getItemCount() {
         return books.size();
     }
-    
+
     public class ViewHolder extends RecyclerView.ViewHolder{
         private CardView cardView;
         private ImageView imageView;
@@ -134,7 +154,6 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
                   notifyItemChanged(getAdapterPosition());
                 }
             });
-
             upArrow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
