@@ -1,20 +1,31 @@
 package com.example.simpleproject;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class utils {
+    private SharedPreferences sharedPreferences;
+    private static final String All_Books_keys ="all_books";
+    private static final String FAV_Books_keys ="fav_books";
     private static utils instance;
-    private static ArrayList<Book> allBooks;
-    private static ArrayList<Book> favourite;
     private static ArrayList<Book> alreadyReadBooks;
     private static ArrayList<Book> wantToRead;
     private static ArrayList<Book> currentRead;
 
 
-    private utils() {
-        if (allBooks==null){
-            allBooks= new ArrayList<>();
+    private utils(Context context) {
+
+        sharedPreferences = context.getSharedPreferences("daseBase",Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (getAllBooks()==null){
             initData();
         }
         if (alreadyReadBooks==null){
@@ -26,22 +37,25 @@ public class utils {
         if (currentRead==null){
             currentRead= new ArrayList<>();
         }
-        if (favourite==null){
-            favourite= new ArrayList<>();
+        if (getFavourite()==null){
+      editor.putString(FAV_Books_keys,gson.toJson(new ArrayList<Book>()));
+       editor.apply();
+
         }
 
     }
 
     private void initData() {
 
-        allBooks.add(new Book(1,"1Q84","Murakami",1350,
+        ArrayList<Book> alllbooks = new ArrayList<>();
+        alllbooks.add(new Book(1,"1Q84","Murakami",1350,
                 "https://th.bing.com/th/id/R.bf61cd5bd41e17b863e802f4b52aee7b?rik=IBsEzwb5huqeyQ&riu=htt" +
                         "p%3a%2f%2fimg2.imagesbn.com%2fp%2f9780307476463_p0_v1_s260x420.JPG&ehk=pt3gCwCIGISShaFJMDT" +
                         "5NyQx" +
                         "A%2b8bRhFm4hRksfhfhi0%3d&risl=&pid=ImgRaw&r=0","A work","Long decription"));
 
 
-        allBooks.add(new Book(2,"The Old Man and the Sea"," Ernest Hemingway",
+        alllbooks.add(new Book(2,"The Old Man and the Sea"," Ernest Hemingway",
                 1350,"data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAA" +
                 "D/2wBDAAsJCQcJCQcJCQkJCwkJCQkJCQsJCwsMCwsLDA0QDBEODQ4MEhkSJRodJR0ZHxwpKRY" +
                 "lNzU2GioyPi0pMBk7IRP/2wBDAQcICAsJCxULCxUsHRkdLCwsLCwsLCwsLCwsLCwsLCwsLCwsLCwsL" +
@@ -55,58 +69,92 @@ public class utils {
                 "urbVuWZKkxPFKlSoJP//Z","The Old Man and the Sea is a novella writ" +
                 "ten by the American author Ernest Hemingway in 1951 in Cayo Blanco","Long decription"));
 
+        /**
+         * 把数组转换为Json储存放入编辑器里
+         */
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        editor.putString(All_Books_keys,gson.toJson(alllbooks));
+        editor.apply();
     }
 
-    public static utils getInstance(){
+    public static utils getInstance(Context context){
         if (instance!=null){
             return instance;
         }else {
-            instance = new utils();
+            instance = new utils(context);
             return instance;
         }
     }
 
 
+    public ArrayList<Book> getAllBooks() {
 
-
-
-    public static ArrayList<Book> getAllBooks() {
-        return allBooks;
+        Gson gson = new Gson();
+        Type type =new TypeToken<ArrayList<Book>>(){}.getType();
+        //如果没有获得任何数据，返回null  /*
+        /**
+         * 第三个参数 是转换成json的对象
+         */
+        ArrayList<Book> books = gson.fromJson(sharedPreferences.getString(All_Books_keys,null),type);
+        return books;
     }
 
-    public static ArrayList<Book> getAlreadyReadBooks() {
-        return alreadyReadBooks;
-    }
 
-    public static ArrayList<Book> getWantToRead() {
-        return wantToRead;
-    }
-
-    public static ArrayList<Book> getCurrentRead() {
-        return currentRead;
-    }
-
-    public static ArrayList<Book> getFavourite() {
-        return favourite;
+    public  ArrayList<Book> getFavourite() {
+        Gson gson = new Gson();
+        Type type =new TypeToken<ArrayList<Book>>(){}.getType();
+        ArrayList<Book> books = gson.fromJson(sharedPreferences.getString(FAV_Books_keys,null),type);
+        return books;
     }
 
     public Book  getBookByid (int id){
-        for (Book b:allBooks){
-            if (b.getId()==id){
-                return  b;
+
+        ArrayList<Book> books = getAllBooks();
+        if (books!=null){
+            for (Book b : books) {
+                if (b.getId() == id) {
+                    return b;
+                }
             }
         }
         return  null;
     }
 
     public boolean AddBooktofavourite(Book book){
-        favourite.add(book);
-        return true;
+        ArrayList<Book> books = getFavourite();
+    if (null!=book){
+        if (books.add(book)){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            Gson gson = new Gson();
+            editor.remove(FAV_Books_keys);
+            // 更新
+            editor.putString(FAV_Books_keys,gson.toJson(books));
+            editor.apply();
+            return true;
+        }
+    }
+        return false;
     }
 
     public boolean delFavBook(Book book){
-        favourite.remove(book);
-        return true;
+        ArrayList<Book> books = getFavourite();
+        if (books!=null){
+            for (Book b:books
+                 ) {
+                if (b.getId()==book.getId()){
+                    books.remove(b);
+                    Gson gson = new Gson();
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(FAV_Books_keys);
+                    editor.putString(FAV_Books_keys,gson.toJson(books));
+                    editor.commit();
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
 

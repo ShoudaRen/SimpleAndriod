@@ -89,7 +89,7 @@ public class BookRecycleViewAdapter extends RecyclerView.Adapter<BookRecycleView
                         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                if (  utils.getInstance().delFavBook(books.get(position))){
+                                if (  utils.getInstance(myContext).delFavBook(books.get(position))){
                                     Toast.makeText(myContext, "delete success", Toast.LENGTH_SHORT).show();
                                     notifyDataSetChanged();
                                 }else {

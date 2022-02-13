@@ -26,7 +26,7 @@ public class BookActivity extends AppCompatActivity {
             int bookid= intent.getIntExtra("bookid",-1);
             if (bookid!=-1){
                 //获得点击的书的id
-                Book incomingBook = utils.getInstance().getBookByid(bookid);
+                Book incomingBook = utils.getInstance(this).getBookByid(bookid);
                 if (incomingBook!=null){
                     setData(incomingBook);
                     handleAlreadyAddToFav(incomingBook);
@@ -37,7 +37,7 @@ public class BookActivity extends AppCompatActivity {
     }
 
     private void handleAlreadyAddToFav(Book incomingBook) {
-        ArrayList<Book> FavBook = utils.getInstance().getFavourite();
+        ArrayList<Book> FavBook = utils.getInstance(this).getFavourite();
         boolean existedFav=false;
         //检查favbooking中是否有正在选择的这个
         for (Book b: FavBook){
@@ -52,7 +52,7 @@ public class BookActivity extends AppCompatActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (utils.getInstance().AddBooktofavourite(incomingBook)){
+                    if (utils.getInstance(BookActivity.this).AddBooktofavourite(incomingBook)){
                         Toast.makeText(BookActivity.this, "Book add", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent( BookActivity.this,MyFavActivity.class);
                         startActivity(intent);

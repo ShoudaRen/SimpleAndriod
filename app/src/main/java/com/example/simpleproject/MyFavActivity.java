@@ -21,7 +21,7 @@ public class MyFavActivity extends AppCompatActivity {
         MyfaVrecyclerView.setAdapter(adapter);
 
         MyfaVrecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter.setBooks( utils.getInstance().getFavourite());
+        adapter.setBooks( utils.getInstance(this).getFavourite());
     }
 
     @Override
